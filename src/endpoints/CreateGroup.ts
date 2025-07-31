@@ -42,7 +42,7 @@ export const CreateGroup = async (req: Request, res: Response) => {
 
 
   res.json({
-    chatID: chatObj.id.toString(),
+    chatID: "-"+chatObj.id.toString(),
 
   })
 
