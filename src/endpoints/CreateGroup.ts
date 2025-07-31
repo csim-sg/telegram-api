@@ -30,15 +30,20 @@ export const CreateGroup = async (req: Request, res: Response) => {
   const chatObj = combineUpdate.chats[0]
 
   console.log(chatObj.id)
-  await client.invoke(new Api.messages.EditChatAbout({
-    peer: chatObj.id, 
-    about: req.body.context
-  }));
+  try {
+    await client.invoke(new Api.messages.EditChatAbout({
+      peer: chatObj, 
+      about: req.body.context
+    }));
+  } catch(e) {
+    console.log("Unable to change the group chat about.")
+  }
+  
 
 
   res.json({
     chatID: chatObj.id.toString(),
-    
+
   })
 
   //  for (const update of combineUpdate.chats) {
