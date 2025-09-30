@@ -1,13 +1,16 @@
 import { Request, Response } from "express";
 
 function formatURL(baseURL: string, linkString: string): string {
+  // Remove hashtag
+  const cleanLink = linkString.split('#')[0];
+
   // Check if linkString has a protocol
-  if (linkString.includes(':')) {
+  if (cleanLink.includes(':')) {
     try {
-      const url = new URL(linkString);
+      const url = new URL(cleanLink);
       // Return as-is if not http/https
       if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-        return linkString;
+        return cleanLink;
       }
     } catch {
       // Not a valid URL, continue processing
@@ -17,12 +20,12 @@ function formatURL(baseURL: string, linkString: string): string {
   const base = new URL(baseURL);
 
   // If linkString starts with '/', resolve from origin
-  if (linkString.startsWith('/')) {
-    return new URL(linkString, base.origin).href;
+  if (cleanLink.startsWith('/')) {
+    return new URL(cleanLink, base.origin).href;
   }
 
   // Otherwise, resolve relative to the baseURL's directory
-  return new URL(linkString, baseURL).href;
+  return new URL(cleanLink, baseURL).href;
 }
 
 export const FormatURL = async (req: Request, res: Response) => {
@@ -32,9 +35,14 @@ export const FormatURL = async (req: Request, res: Response) => {
     return res.status(400).json({ error: "baseURL and linkString are required" });
   }
 
+  if (!Array.isArray(linkString)) {
+    return res.status(400).json({ error: "linkString must be an array" });
+  }
+
   try {
-    const result = formatURL(baseURL, linkString);
-    res.json({ url: result });
+    const results = linkString.map(link => formatURL(baseURL, link));
+    const uniqueResults = results.filter((url, index) => results.indexOf(url) === index);
+    res.json({ urls: uniqueResults });
   } catch (error) {
     res.status(500).json({ error: "Failed to format URL" });
   }
