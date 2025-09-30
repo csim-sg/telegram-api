@@ -2,6 +2,7 @@ import { config } from 'dotenv';
 config()
 import express from 'express';
 import { CreateGroup } from './endpoints/CreateGroup'
+import { FormatURL } from './endpoints/FormatURL';
 
 
 
@@ -11,6 +12,7 @@ app.use(express.json());
 
 
 app.post('/create-group', CreateGroup);
+app.post('/format-url', FormatURL);
 
 
 app.listen(port, () => {
