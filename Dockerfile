@@ -1,23 +1,27 @@
-FROM node:20-alpine AS buildStage
+FROM ghcr.io/graalvm/graalvm-community:17 AS builder
+
+# Install dependencies and Gradle
+RUN microdnf install -y findutils unzip
+RUN curl -L https://services.gradle.org/distributions/gradle-8.6-bin.zip -o gradle.zip && \
+    unzip gradle.zip && \
+    mv gradle-8.6 /opt/gradle && \
+    rm gradle.zip
+ENV PATH="/opt/gradle/bin:${PATH}"
 
 WORKDIR /app
+COPY . .
 
-COPY ./ /app/
+# Build the application
+# We skip tests to speed up the build in this environment
+RUN gradle build -x test --no-daemon
 
-RUN apk add --no-cache \
-    python3 \
-    make \
-    g++ \
-    bash
-
-RUN npm i
-RUN npm run build
-
-FROM node:20-alpine
+# Run stage
+FROM ghcr.io/graalvm/graalvm-community:17
 
 WORKDIR /app
+COPY --from=builder /app/build/libs/*.jar app.jar
 
-COPY --from=buildStage /app/.dist ./.dist
-COPY --from=buildStage /app/node_modules ./node_modules
+# Expose the port
+EXPOSE 8080
 
-CMD ["node", ".dist/index.js"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

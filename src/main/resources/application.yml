@@ -1,0 +1,7 @@
+telegram:
+  app-id: ${TELEGRAM_APP_ID:0}
+  api-hash: ${TELEGRAM_API_HASH:default_hash}
+  session-string: ${TELEGRAM_SESSION_STRING:}
+
+server:
+  port: 8080

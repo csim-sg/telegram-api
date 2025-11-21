@@ -1,0 +1,53 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.3'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.graalvm.buildtools.native' version '0.9.28'
+}
+
+group = 'com.bw.microapp'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('awsSdkVersion', '2.25.11')
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'software.amazon.awssdk:cloudfront'
+    
+    // TDLight (Java TDLib wrapper)
+    implementation 'it.tdlight:java-client:3.4.0+td.1.8.24'
+    implementation 'it.tdlight:java-natives-darwin-arm64:3.4.0+td.1.8.24' // For Mac Apple Silicon
+    implementation 'it.tdlight:java-natives-linux-amd64:3.4.0+td.1.8.24' // For Docker (Linux AMD64)
+    implementation 'it.tdlight:java-natives-linux-arm64:3.4.0+td.1.8.24' // For Docker (Linux ARM64)
+    
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "software.amazon.awssdk:bom:${awsSdkVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
