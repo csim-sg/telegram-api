@@ -1,0 +1,24 @@
+{
+	"name": "Java (GraalVM)",
+	"image": "ghcr.io/graalvm/graalvm-community:17",
+	"features": {
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": "none",
+			"installGradle": true,
+			"gradleVersion": "8.6"
+		},
+		"ghcr.io/devcontainers/features/git:1": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"vscjava.vscode-java-pack",
+				"vscjava.vscode-gradle"
+			],
+            "settings": {
+                "java.home": "/opt/java/openjdk"
+            }
+		}
+	},
+	"remoteUser": "root"
+}
